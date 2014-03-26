@@ -23,14 +23,14 @@ class Window < Gosu::Window
 
     @squareboy = Squareboy.new(self)
     @objects = [Floor.new(self), 
+                Block.new(self, 300, 670),
                 Block.new(self, 300, 600),
-                Block.new(self, 300, 600),
-                Block.new(self, 330, 500),
+                Block.new(self, 330, 400),
                 Block.new(self, 330, 600),
                 Block.new(self, 430, 500),
-                Block.new(self, 530, 300),
-                Block.new(self, 730, 500),
-                Block.new(self, 930, 300),
+                Block.new(self, 530, 500),
+                Block.new(self, 730, 600),
+                Block.new(self, 930, 600),
                 Block.new(self, 1030, 600),
                 Block.new(self, 1130, 500),
                 Block.new(self, 1230, 600)
@@ -146,7 +146,7 @@ class Squareboy
     @window.objects.each do |object|
       # if any of the objects right-hand-sides are touching the left-hand-side of squareboy, prevent movement
       if (@x == (object.x + object.width)) && 
-         (((@y > object.y) && @y < (object.y + object.height)) ||
+         (((@y >= object.y) && @y < (object.y + object.height)) ||
          (((@y + @height) > object.y) && ((@y + @height) < (object.y + object.height))))
         return false
       end
@@ -160,10 +160,8 @@ class Squareboy
     @window.objects.each do |object|
       # if any of the objects right-hand-sides are touching the left-hand-side of squareboy, prevent movement
       if ((@x + @width) == object.x) && 
-         (((@y > object.y) && @y < (object.y + object.height)) ||
+         (((@y >= object.y) && @y < (object.y + object.height)) ||
          (((@y + @height) > object.y) && ((@y + @height) < (object.y + object.height))))
-        puts "CANNOT MOVE RIGHT"
-        puts "@y=#{@y}, @height=#{@height}, object.y=#{object.y}, object.height=#{object.height}"
         return false
       end
     end
