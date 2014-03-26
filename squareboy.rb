@@ -22,7 +22,19 @@ class Window < Gosu::Window
     @keys_being_pressed = []
 
     @squareboy = Squareboy.new(self)
-    @objects = [Floor.new(self), Block.new(self)]
+    @objects = [Floor.new(self), 
+                Block.new(self, 300, 600),
+                Block.new(self, 300, 600),
+                Block.new(self, 330, 500),
+                Block.new(self, 330, 600),
+                Block.new(self, 430, 500),
+                Block.new(self, 530, 300),
+                Block.new(self, 730, 500),
+                Block.new(self, 930, 300),
+                Block.new(self, 1030, 600),
+                Block.new(self, 1130, 500),
+                Block.new(self, 1230, 600)
+                ]
   end
 
   def update
@@ -69,6 +81,12 @@ class Window < Gosu::Window
       @squareboy.jump
     end
   end
+
+  def move_screen_left
+    @objects.each do |object|
+      object.x = object.x - MOVEMENT_INTERVAL
+    end
+  end
 end
 
 class Squareboy
@@ -93,10 +111,14 @@ class Squareboy
       if @jump_progress < 15 && move_up
         @jump_progress = @jump_progress + 1
       elsif move_down
+        @jump_progress = 15
+        @jumping = false
       else 
         @jumping = false
         @jump_progress = 0
       end
+    else
+      move_down
     end
   end
 
@@ -144,18 +166,21 @@ class Squareboy
       end
     end
 
-    @x = @x + @window.movement_interval
+    if @x > (@window.width / 2)
+      @window.move_screen_left
+    else 
+      @x = @x + @window.movement_interval
+    end
+
     return true
   end
 
   def move_up
     @window.objects.each do |object|
       # if any of the objects bottom-sides are touching the top-side of squareboy, prevent movement
-      puts "@y=#{@y}m objectyheight=#{(object.y + object.height)}, #{object.class}"
       if (@y == (object.y + object.height)) && 
          (((@x >= object.x) && @x <= (object.x + object.width)) ||
          (((@x + @width) >= object.x) && ((@x + @width) <= (object.x + object.width))))
-         puts "CANT MOVE UP"
         return false
       end
     end
@@ -185,10 +210,10 @@ class Block
 
   attr_accessor :x, :y, :width, :height
 
-  def initialize(window)
+  def initialize(window, x, y)
     @window = window
-    @x = 350
-    @y = 500
+    @x = x
+    @y = y
     @width = WIDTH
     @height = HEIGHT
     @is_jumping = false
