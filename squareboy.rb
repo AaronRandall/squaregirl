@@ -146,8 +146,8 @@ class Squareboy
     @window.objects.each do |object|
       # if any of the objects right-hand-sides are touching the left-hand-side of squareboy, prevent movement
       if (@x == (object.x + object.width)) && 
-         (((@y >= object.y) && @y <= (object.y + object.height)) ||
-         (((@y + @height) >= object.y) && ((@y + @height) <= (object.y + object.height))))
+         (((@y > object.y) && @y < (object.y + object.height)) ||
+         (((@y + @height) > object.y) && ((@y + @height) < (object.y + object.height))))
         return false
       end
     end
@@ -160,8 +160,10 @@ class Squareboy
     @window.objects.each do |object|
       # if any of the objects right-hand-sides are touching the left-hand-side of squareboy, prevent movement
       if ((@x + @width) == object.x) && 
-         (((@y >= object.y) && @y <= (object.y + object.height)) ||
-         (((@y + @height) >= object.y) && ((@y + @height) <= (object.y + object.height))))
+         (((@y > object.y) && @y < (object.y + object.height)) ||
+         (((@y + @height) > object.y) && ((@y + @height) < (object.y + object.height))))
+        puts "CANNOT MOVE RIGHT"
+        puts "@y=#{@y}, @height=#{@height}, object.y=#{object.y}, object.height=#{object.height}"
         return false
       end
     end
