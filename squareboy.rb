@@ -3,6 +3,7 @@ require 'gosu'
 class Window < Gosu::Window
   WINDOW_WIDTH = 1200
   WINDOW_HEIGHT = 800
+  BLOCK_SIZE = 30
 
   MOVEMENT_INTERVAL = 10
 
@@ -11,25 +12,22 @@ class Window < Gosu::Window
   KEY_DOWN  = 125
   KEY_UP    = 126
 
-  attr_accessor :objects, :movement_interval
+  attr_accessor :block_size, :objects, :movement_interval
 
   def initialize
     super WINDOW_WIDTH, WINDOW_HEIGHT, false
 
-    @width = WINDOW_WIDTH
+    @width  = WINDOW_WIDTH
     @height = WINDOW_HEIGHT
     @movement_interval = MOVEMENT_INTERVAL
+    @block_size = BLOCK_SIZE
     @keys_being_pressed = []
 
     @squareboy = Squareboy.new(self)
     @objects = [Floor.new(self), 
-                Block.new(self, 300, 670),
-                Block.new(self, 300, 600),
-                Block.new(self, 330, 400),
-                Block.new(self, 330, 600),
-                Block.new(self, 430, 500),
-                Block.new(self, 530, 500),
-                Block.new(self, 730, 600),
+                Block.new(self, 300, 670, 4),
+                Block.new(self, 530, 500, 12),
+                Block.new(self, 730, 600, 10),
                 Block.new(self, 930, 600),
                 Block.new(self, 1030, 600),
                 Block.new(self, 1130, 500),
@@ -90,17 +88,14 @@ class Window < Gosu::Window
 end
 
 class Squareboy
-  WIDTH = 30
-  HEIGHT = 30
-
-  attr_accessor :x, :y, :width, :height
+  attr_accessor :x, :y
 
   def initialize(window)
     @window = window
     @x = 10
     @y = 500
-    @width = WIDTH
-    @height = HEIGHT
+    @width  = @window.block_size
+    @height = @window.block_size
     @is_jumping = false
     @color = Gosu::Color::WHITE
     @jump_progress = 0
@@ -152,7 +147,9 @@ class Squareboy
       end
     end
 
-    @x = @x - @window.movement_interval
+    if @x > 0
+      @x = @x - @window.movement_interval
+    end
     return true
   end
 
@@ -205,17 +202,14 @@ class Squareboy
 end
 
 class Block
-  WIDTH = 30
-  HEIGHT = 30
-
   attr_accessor :x, :y, :width, :height
 
-  def initialize(window, x, y)
+  def initialize(window, x, y, length=1)
     @window = window
     @x = x
     @y = y
-    @width = WIDTH
-    @height = HEIGHT
+    @width  = @window.block_size * length
+    @height = @window.block_size
     @is_jumping = false
     @color = Gosu::Color::RED
   end
@@ -233,16 +227,14 @@ end
 
 class Floor
   WIDTH = 3000
-  HEIGHT = 30
-
   attr_accessor :x, :y, :width, :height
 
   def initialize(window)
     @window = window
     @x = 0
     @y = 700
-    @width = WIDTH
-    @height = HEIGHT
+    @width  = WIDTH
+    @height = @window.block_size
     @color = Gosu::Color::GREEN
   end
 
