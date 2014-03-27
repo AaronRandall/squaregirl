@@ -8,32 +8,31 @@ class Level
 
   def block_objects
     level_blocks = 
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "                    |" +
-      "    XXXXXX          |" +
-      "                XXX |" +
-      "                    |" +
-      "                    |" +
-      "      XXXXXX        |" +
-      "                    |" +
-      "                 X X|" +
-      "                    |" +
-      "           X     X X|" +
-      "           X     X X|" +
-      "      XX  XXX    X X|" +
-      "      X     X    X X|" +
-      "      X     X    X X|" +
-      "XXXXXXXXXXXXXXXXXXXX|"
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                     X                                                                                                                                                                                           |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                X                                                                                                                                                                                                |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                          XXX                                                                                                                                                                                                    |" +
+      "                                                  XX                                                                                                                                                                                                             |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                           XXX                                                                                                                                                                                                                   |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                XXXXXXX                                                                                                                                                                                                                          |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                 XXXXXXX                                                                                                                                                                                                                                         |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "                                                                                                                                                                                                                                                                 |" +
+      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|"
 
     x = 0
     y = 0
@@ -47,9 +46,9 @@ class Level
       if block == "|"
         y = y + @window.block_size
         x = 0
+      else 
+        x = x + @window.block_size
       end
-
-      x = x + @window.block_size
     end
 
     return blocks
@@ -82,16 +81,6 @@ class Window < Gosu::Window
     @squareboy = Squareboy.new(self)
 
     @objects = Level.new(self).block_objects
-
-    #@objects = [Floor.new(self), 
-    #            Block.new(self, 300, 670, 4),
-    #            Block.new(self, 530, 500, 12),
-    #            Block.new(self, 730, 600, 10),
-    #            Block.new(self, 930, 600),
-    #            Block.new(self, 1030, 600),
-    #            Block.new(self, 1130, 500),
-    #            Block.new(self, 1230, 600)
-    #            ]
   end
 
   def update
@@ -144,6 +133,12 @@ class Window < Gosu::Window
       object.x = object.x - MOVEMENT_INTERVAL
     end
   end
+
+  def move_screen_right
+    @objects.each do |object|
+      object.x = object.x + MOVEMENT_INTERVAL
+    end
+  end
 end
 
 class Squareboy
@@ -151,7 +146,7 @@ class Squareboy
 
   def initialize(window)
     @window = window
-    @x = 10
+    @x = 100
     @y = 500
     @width  = @window.block_size
     @height = @window.block_size
@@ -206,7 +201,9 @@ class Squareboy
       end
     end
 
-    if @x > 0
+    if @x < (@window.width / 3)
+      @window.move_screen_right
+    else
       @x = @x - @window.movement_interval
     end
     return true
@@ -222,9 +219,9 @@ class Squareboy
       end
     end
 
-    if @x > (@window.width / 2)
+    if @x > ((@window.width / 3) * 2)
       @window.move_screen_left
-    else 
+    else
       @x = @x + @window.movement_interval
     end
 
@@ -263,38 +260,14 @@ end
 class Block
   attr_accessor :x, :y, :width, :height
 
-  def initialize(window, x, y, length=1)
+  def initialize(window, x, y)
     @window = window
     @x = x
     @y = y
-    @width  = @window.block_size * length
+    @width  = @window.block_size
     @height = @window.block_size
     @is_jumping = false
     @color = Gosu::Color::RED
-  end
-
-  def update
-  end
-
-  def draw
-    @window.draw_quad(@x, @y, @color,
-                      (@x + @width), @y, @color,
-                      @x, (@y + @height), @color,
-                      (@x + @width), (@y + @height), @color)
-  end
-end
-
-class Floor
-  WIDTH = 3000
-  attr_accessor :x, :y, :width, :height
-
-  def initialize(window)
-    @window = window
-    @x = 0
-    @y = 700
-    @width  = WIDTH
-    @height = @window.block_size
-    @color = Gosu::Color::GREEN
   end
 
   def update
