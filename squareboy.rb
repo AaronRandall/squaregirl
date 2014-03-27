@@ -29,10 +29,10 @@ class Level
       "                                                                                                                                                                                                                                                                 |" +
       "                                XXXXXXX                                                                                                                                                                                                                          |" +
       "                                                                                                                                                                                                                                                                 |" +
-      "                 XXXXXXX                                                                                                                                                                                                                                         |" +
+      "                 XXXXXXXXX                                                                                                                                                                                                                                       |" +
       "                                                                                                                                                                                                                                                                 |" +
       "                                                                                                                                                                                                                                                                 |" +
-      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|"
+      "XXXXXXXXXXXXXXXXX   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX|"
 
     x = 0
     y = 0
@@ -62,10 +62,10 @@ class Window < Gosu::Window
 
   MOVEMENT_INTERVAL = 10
 
-  KEY_LEFT  = 123
-  KEY_RIGHT = 124
-  KEY_DOWN  = 125
-  KEY_UP    = 126
+  KEY_LEFT   = 123
+  KEY_RIGHT  = 124
+  KEY_DOWN   = 125
+  KEY_UP     = 126
 
   attr_accessor :block_size, :objects, :movement_interval
 
@@ -77,16 +77,26 @@ class Window < Gosu::Window
     @movement_interval = MOVEMENT_INTERVAL
     @block_size = BLOCK_SIZE
     @keys_being_pressed = []
+    
+    setup_level
+  end
 
+  def setup_level
     @squareboy = Squareboy.new(self)
-
     @objects = Level.new(self).block_objects
+  end
+
+  def restart
+    @game_paused = false
+    setup_level
   end
 
   def update
     if @keys_being_pressed.count > 0
       perform_key_press_action
     end
+
+    return if @game_paused
 
     @squareboy.update
     @objects.each do |object|
@@ -139,6 +149,11 @@ class Window < Gosu::Window
       object.x = object.x + MOVEMENT_INTERVAL
     end
   end
+
+  def life_lost
+    @game_paused = true
+    restart
+  end
 end
 
 class Squareboy
@@ -169,6 +184,10 @@ class Squareboy
     else
       move_down
     end
+
+    if @y > @window.height
+      @window.life_lost
+    end
   end
 
   def draw
@@ -176,15 +195,6 @@ class Squareboy
                       (@x + @width), @y, @color,
                       @x, (@y + @height), @color,
                       (@x + @width), (@y + @height), @color)
-  end
-
-  def collided_with_object?(object)
-    if (self.x > object.x && self.x < object.x + object.width) &&
-       (self.y + self.height >= object.y)
-       return true
-    end
-
-    return false
   end
 
   def jump
