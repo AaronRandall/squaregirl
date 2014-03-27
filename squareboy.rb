@@ -1,5 +1,61 @@
 require 'gosu'
 
+class Level
+
+  def initialize(window)
+    @window = window 
+  end
+
+  def block_objects
+    level_blocks = 
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "                    |" +
+      "    XXXXXX          |" +
+      "                XXX |" +
+      "                    |" +
+      "                    |" +
+      "      XXXXXX        |" +
+      "                    |" +
+      "                 X X|" +
+      "                    |" +
+      "           X     X X|" +
+      "           X     X X|" +
+      "      XX  XXX    X X|" +
+      "      X     X    X X|" +
+      "      X     X    X X|" +
+      "XXXXXXXXXXXXXXXXXXXX|"
+
+    x = 0
+    y = 0
+    blocks = []
+
+    level_blocks.split('').each do |block|   
+      if block == "X"
+        blocks.push(Block.new(@window, x, y))
+      end
+
+      if block == "|"
+        y = y + @window.block_size
+        x = 0
+      end
+
+      x = x + @window.block_size
+    end
+
+    return blocks
+  end
+end
+
 class Window < Gosu::Window
   WINDOW_WIDTH = 1200
   WINDOW_HEIGHT = 800
@@ -24,15 +80,18 @@ class Window < Gosu::Window
     @keys_being_pressed = []
 
     @squareboy = Squareboy.new(self)
-    @objects = [Floor.new(self), 
-                Block.new(self, 300, 670, 4),
-                Block.new(self, 530, 500, 12),
-                Block.new(self, 730, 600, 10),
-                Block.new(self, 930, 600),
-                Block.new(self, 1030, 600),
-                Block.new(self, 1130, 500),
-                Block.new(self, 1230, 600)
-                ]
+
+    @objects = Level.new(self).block_objects
+
+    #@objects = [Floor.new(self), 
+    #            Block.new(self, 300, 670, 4),
+    #            Block.new(self, 530, 500, 12),
+    #            Block.new(self, 730, 600, 10),
+    #            Block.new(self, 930, 600),
+    #            Block.new(self, 1030, 600),
+    #            Block.new(self, 1130, 500),
+    #            Block.new(self, 1230, 600)
+    #            ]
   end
 
   def update
@@ -176,8 +235,8 @@ class Squareboy
     @window.objects.each do |object|
       # if any of the objects bottom-sides are touching the top-side of squareboy, prevent movement
       if (@y == (object.y + object.height)) && 
-         (((@x >= object.x) && @x <= (object.x + object.width)) ||
-         (((@x + @width) >= object.x) && ((@x + @width) <= (object.x + object.width))))
+         (((@x >= object.x) && @x < (object.x + object.width)) ||
+         (((@x + @width) > object.x) && ((@x + @width) <= (object.x + object.width))))
         return false
       end
     end
@@ -190,8 +249,8 @@ class Squareboy
     @window.objects.each do |object|
       # if any of the objects top-sides are touching the bottom-side of squareboy, prevent movement
       if ((@y + @height) == object.y) && 
-         (((@x >= object.x) && @x <= (object.x + object.width)) ||
-         (((@x + @width) >= object.x) && ((@x + @width) <= (object.x + object.width))))
+         (((@x >= object.x) && @x < (object.x + object.width)) ||
+         (((@x + @width) > object.x) && ((@x + @width) <= (object.x + object.width))))
         return false
       end
     end
